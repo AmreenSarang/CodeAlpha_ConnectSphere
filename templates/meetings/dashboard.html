@@ -1,0 +1,557 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | ConnectSphere</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #0b1020;
+            --sidebar: #10172a;
+            --card: #151e33;
+            --card-hover: #1b2740;
+            --purple: #8055f6;
+            --pink: #df4ca9;
+            --text: #f5f6ff;
+            --muted: #9ba9c7;
+            --border: rgba(255,255,255,.09);
+            --green: #22c55e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .app { display: flex; min-height: 100vh; }
+
+        /* Sidebar — same visual language as meeting_list.html */
+        .sidebar {
+            width: 250px;
+            flex: 0 0 250px;
+            position: fixed;
+            inset: 0 auto 0 0;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            padding: 28px 18px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 10px;
+            margin-bottom: 45px;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -.7px;
+        }
+
+        .brand-icon {
+            width: 39px;
+            height: 39px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            color: white;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            font-size: 23px;
+        }
+
+        .brand-name span {
+            background: linear-gradient(110deg, #a78bfa, #ec64bd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-label {
+            padding: 0 12px;
+            margin-bottom: 14px;
+            color: #6f7e9d;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .nav { display: flex; flex-direction: column; gap: 9px; }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 14px;
+            border-radius: 11px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 500;
+            transition: .22s ease;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            color: white;
+            background: linear-gradient(110deg, #6846d9, #8b55ef);
+            box-shadow: 0 6px 20px #8055f633;
+        }
+
+        .nav-icon { width: 21px; text-align: center; font-size: 18px; }
+
+        .sidebar-bottom { margin-top: auto; }
+
+        .help-card {
+            padding: 17px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: linear-gradient(140deg, #28204a, #18213b);
+        }
+
+        .help-card h4 { margin-bottom: 8px; font-size: 13px; }
+        .help-card p { color: var(--muted); font-size: 11px; line-height: 1.7; }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 18px 5px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            color: white;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+        }
+
+        .profile-info strong { display: block; font-size: 12px; }
+        .profile-info span { color: var(--muted); font-size: 10px; }
+
+        .logout-form { margin-top: 15px; }
+        .logout {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1px solid #fb718544;
+            border-radius: 10px;
+            color: #fda4af;
+            background: #fb718511;
+            cursor: pointer;
+            font: inherit;
+            font-size: 12px;
+            transition: .2s;
+        }
+        .logout:hover { background: #fb718522; }
+
+        /* Main area */
+        .main {
+            width: calc(100% - 250px);
+            min-width: 0;
+            margin-left: 250px;
+        }
+
+        .topbar {
+            min-height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 18px 35px;
+            border-bottom: 1px solid var(--border);
+            background: #10172a;
+        }
+
+        .topbar h2 { font-size: 18px; font-weight: 700; }
+
+        .user-chip { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
+        .user-avatar {
+            width: 39px;
+            height: 39px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            color: white;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+        }
+
+        .content { max-width: 1600px; padding: 32px 35px 45px; }
+
+        /* Hero banner */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 34px;
+            border: 1px solid #ffffff12;
+            border-radius: 19px;
+            background: linear-gradient(110deg, #32245f, #5a3794, #783e9c);
+            box-shadow: 0 15px 35px #0003;
+        }
+
+        .hero::after {
+            content: "✦";
+            position: absolute;
+            top: -55px;
+            right: 7%;
+            color: #ffffff12;
+            font-size: 210px;
+            pointer-events: none;
+        }
+
+        .hero-content { position: relative; z-index: 1; max-width: 690px; }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 8px 12px;
+            margin-bottom: 17px;
+            border: 1px solid #ffffff55;
+            border-radius: 30px;
+            color: #f0eaff;
+            background: #ffffff17;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .7px;
+        }
+
+        .hero h1 { margin-bottom: 11px; font-size: clamp(26px, 3vw, 36px); line-height: 1.25; }
+        .hero p { max-width: 570px; color: #e0d7f8; font-size: 12px; line-height: 1.8; }
+
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 23px; }
+
+        .button {
+            min-height: 43px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 17px;
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font: inherit;
+            font-size: 11px;
+            font-weight: 700;
+            transition: .22s ease;
+        }
+
+        .button:hover { transform: translateY(-3px); }
+        .button-white { color: #6038a9; background: white; }
+        .button-glass { color: white; border: 1px solid #ffffff66; background: #ffffff13; }
+        .button-primary { color: white; background: linear-gradient(110deg, var(--purple), var(--pink)); box-shadow: 0 5px 18px #8055f633; }
+        .button-primary:hover { box-shadow: 0 8px 22px #8055f655; }
+
+        /* Headings and messages */
+        .section-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 15px;
+            margin: 32px 0 17px;
+        }
+
+        .section-heading h2 { margin-bottom: 6px; font-size: 18px; }
+        .section-heading p { color: var(--muted); font-size: 11px; }
+
+        .messages { margin: 0 0 18px; padding: 0; list-style: none; }
+        .messages li {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border: 1px solid #22c55e33;
+            border-radius: 10px;
+            color: #86efac;
+            background: #22c55e12;
+            font-size: 12px;
+        }
+
+        /* Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .feature-card {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: var(--card);
+            transition: .25s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #8055f677;
+            background: var(--card-hover);
+            box-shadow: 0 13px 28px #0003;
+        }
+
+        .feature-icon {
+            width: 49px;
+            height: 49px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 17px;
+            border-radius: 13px;
+            font-size: 22px;
+        }
+
+        .icon-purple { background: #8055f626; }
+        .icon-blue { background: #38bdf826; }
+        .icon-orange { background: #fb923c22; }
+        .icon-green { background: #22c55e22; }
+        .icon-pink { background: #ec489922; }
+        .icon-cyan { background: #06b6d422; }
+
+        .feature-card h3 { margin-bottom: 9px; font-size: 14px; }
+        .feature-card p {
+            flex: 1;
+            margin-bottom: 17px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .notice {
+            margin-top: 23px;
+            padding: 15px 17px;
+            border: 1px solid #8055f633;
+            border-radius: 12px;
+            color: #c9baff;
+            background: #8055f612;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .footer {
+            margin-top: 32px;
+            padding: 22px 5px 5px;
+            border-top: 1px solid var(--border);
+            color: #71809d;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        @media (max-width: 1100px) {
+            .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 750px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                inset: auto;
+                padding: 18px 15px;
+            }
+
+            .brand { margin-bottom: 22px; }
+            .nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .sidebar-bottom { margin-top: 5px; }
+            .help-card { display: none; }
+            .profile { padding-top: 12px; }
+            .main { width: 100%; margin-left: 0; }
+            .topbar { min-height: 68px; padding: 15px 18px; }
+            .content { padding: 22px 16px 30px; }
+            .hero { padding: 25px 21px; }
+            .hero::after { right: 0; top: -20px; font-size: 145px; }
+            .cards { grid-template-columns: 1fr; }
+            .feature-card { padding: 21px; }
+        }
+
+        @media (max-width: 430px) {
+            .nav { grid-template-columns: 1fr; }
+            .topbar { align-items: flex-start; flex-direction: column; }
+            .hero-actions { flex-direction: column; align-items: stretch; }
+            .button { width: 100%; }
+            .user-chip { align-self: flex-end; }
+        }
+
+        .button:focus-visible, .nav a:focus-visible {
+            outline: 3px solid #a78bfa;
+            outline-offset: 3px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a class="brand" href="{% url 'dashboard' %}">
+            <span class="brand-icon">✦</span>
+            <span class="brand-name">Connect<span>Sphere</span></span>
+        </a>
+
+        <div>
+            <p class="nav-label">Workspace</p>
+            <nav class="nav">
+                <a class="active" href="{% url 'dashboard' %}">
+                    <span class="nav-icon">⌂</span> Dashboard
+                </a>
+                <a href="{% url 'meetings:meeting_list' %}">
+                    <span class="nav-icon">▣</span> My Meetings
+                </a>
+                <a href="{% url 'meetings:create_meeting' %}">
+                    <span class="nav-icon">＋</span> New Meeting
+                </a>
+                <a href="{% url 'accounts:profile' %}">
+                    <span class="nav-icon">♙</span> My Profile
+                </a>
+            </nav>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="help-card">
+                <h4>Need help?</h4>
+                <p>Bring your team together and make collaboration easier with ConnectSphere.</p>
+            </div>
+
+            <div class="profile">
+                <div class="avatar">{{ request.user.username|first|upper }}</div>
+                <div class="profile-info">
+                    <strong>{{ request.user.username }}</strong>
+                    <span>ConnectSphere Member</span>
+                </div>
+            </div>
+
+            <form class="logout-form" method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button class="logout" type="submit">Log Out ↗</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+        <header class="topbar">
+            <h2>Your workspace</h2>
+            <div class="user-chip">
+                <span class="user-avatar">{{ request.user.username|first|upper }}</span>
+                <span>{{ request.user.username }}</span>
+            </div>
+        </header>
+
+        <div class="content">
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <!-- WELCOME BANNER -->
+            <section class="hero">
+                <div class="hero-content">
+                    <span class="hero-tag">✦ YOUR TEAM'S COLLABORATION SPACE</span>
+                    <h1>Welcome back, {{ request.user.first_name|default:request.user.username }}!</h1>
+                    <p>
+                        Meet your team, communicate in real time, and keep your
+                        collaboration organized in one workspace.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="button button-white" href="{% url 'meetings:create_meeting' %}">
+                            ＋ Start a meeting
+                        </a>
+                        <a class="button button-glass" href="{% url 'meetings:meeting_list' %}">
+                            View your meetings →
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- COLLABORATION TOOLS -->
+            <div class="section-heading">
+                <div>
+                    <h2>Collaboration tools</h2>
+                    <p>Choose a tool to get started.</p>
+                </div>
+            </div>
+
+            <section class="cards">
+                <article class="feature-card">
+                    <div class="feature-icon icon-purple">🎥</div>
+                    <h3>Video Meetings</h3>
+                    <p>Create a meeting room and invite participants to join.</p>
+                    <a class="button button-primary" href="{% url 'meetings:create_meeting' %}">
+                        Start meeting →
+                    </a>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon icon-blue">🖥️</div>
+                    <h3>Screen Sharing</h3>
+                    <p>Open a meeting and use its screen-sharing controls.</p>
+                    <a class="button button-primary" href="{% url 'meetings:meeting_list' %}">
+                        Open meetings →
+                    </a>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon icon-orange">📁</div>
+                    <h3>File Sharing</h3>
+                    <p>Choose a meeting to upload or download shared documents.</p>
+                    <a class="button button-primary" href="{% url 'meetings:meeting_list' %}">
+                        Choose meeting →
+                    </a>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon icon-green">💬</div>
+                    <h3>Live Chat</h3>
+                    <p>Send messages to participants connected to a meeting room.</p>
+                    <a class="button button-primary" href="{% url 'meetings:meeting_list' %}">
+                        Open a meeting →
+                    </a>
+                </article>
+
+
+                <article class="feature-card">
+                    <div class="feature-icon icon-cyan">👥</div>
+                    <h3>Meeting Rooms</h3>
+                    <p>Review your meetings or join using a room code.</p>
+                    <a class="button button-primary" href="{% url 'meetings:meeting_list' %}">
+                        View meetings →
+                    </a>
+                </article>
+            </section>
+
+            <div class="notice">
+                <strong>Development note:</strong>
+                Video calling, screen sharing, chat, and file sharing depend on
+                their backend implementation and browser permissions. The
+                collaborative whiteboard still needs drawing and synchronization.
+            </div>
+
+            <footer class="footer">
+                © 2026 ConnectSphere. Connect • Communicate • Collaborate.
+            </footer>
+        </div>
+    </main>
+</div>
+</body>
+</html>

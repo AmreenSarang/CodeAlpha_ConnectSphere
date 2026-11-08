@@ -1,0 +1,511 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ meeting.title }} | ConnectSphere</title>
+
+    <style>
+        :root {
+            --bg: #0b1020;
+            --panel: #151c30;
+            --light: #202b43;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --text: #f4f6ff;
+            --muted: #9ba8c7;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg); color: var(--text);
+            font-family: Arial, sans-serif; min-height: 100vh;
+        }
+        button, input { font: inherit; }
+        button { cursor: pointer; border: 0; }
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 14px; padding: 17px 24px;
+            background: var(--panel); border-bottom: 1px solid #ffffff18;
+        }
+        .brand { font-size: 21px; font-weight: bold; }
+        .brand span {
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            -webkit-background-clip: text; color: transparent;
+        }
+        .meeting-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .room-code, .status { color: var(--muted); font-size: 12px; }
+        .layout {
+            display: grid; grid-template-columns: minmax(0, 1fr) 310px;
+            gap: 18px; padding: 22px; max-width: 1700px; margin: auto;
+        }
+        .main-content { min-width: 0; }
+        .heading {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 12px; flex-wrap: wrap; margin-bottom: 18px;
+        }
+        .heading h1 { font-size: 25px; margin-bottom: 7px; }
+        .heading p { color: var(--muted); font-size: 13px; }
+        .video-panel {
+            width: 100%; min-height: 600px; overflow: hidden;
+            border: 1px solid #ffffff20; border-radius: 15px;
+            background: #080c17;
+        }
+        #jitsi-container { width: 100%; height: 600px; }
+        .side-card {
+            background: var(--panel); border: 1px solid #ffffff18;
+            border-radius: 15px; overflow: hidden; margin-bottom: 15px;
+        }
+        .side-header {
+            padding: 15px; display: flex; justify-content: space-between;
+            border-bottom: 1px solid #ffffff18;
+        }
+        .side-header h2 { font-size: 15px; }
+        .participants { padding: 12px; max-height: 260px; overflow-y: auto; }
+        .participant {
+            display: flex; align-items: center; gap: 10px; padding: 9px 4px;
+            border-bottom: 1px solid #ffffff12; font-size: 13px;
+        }
+        .participant-avatar {
+            width: 35px; height: 35px; display: grid; place-items: center;
+            border-radius: 50%; background: #37305d; flex-shrink: 0;
+        }
+        .chat-messages {
+            display: flex; flex-direction: column; gap: 9px; padding: 12px;
+            height: 250px; overflow-y: auto;
+        }
+        .chat-message {
+            padding: 10px; border-radius: 9px; background: var(--light);
+            overflow-wrap: anywhere;
+        }
+        .chat-message.mine { background: #433276; }
+        .chat-author {
+            color: #c4b5fd; font-size: 11px; margin-bottom: 5px; font-weight: bold;
+        }
+        .chat-text { font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+        .chat-form {
+            display: flex; gap: 8px; padding: 12px;
+            border-top: 1px solid #ffffff18;
+        }
+        .chat-form input {
+            flex: 1; min-width: 0; background: #0d1426; color: white;
+            border: 1px solid #ffffff20; border-radius: 8px; padding: 10px;
+        }
+        .chat-form button {
+            padding: 0 14px; border-radius: 8px;
+            background: var(--purple); color: white;
+        }
+        .toolbar {
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
+            padding: 15px; margin-top: 18px; border: 1px solid #ffffff18;
+            border-radius: 15px; background: var(--panel);
+        }
+        .control {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 105px; padding: 11px 14px; border-radius: 9px;
+            background: var(--light); color: white; text-decoration: none;
+        }
+        .control.active { background: #4c358d; }
+        .control.primary { background: linear-gradient(135deg, var(--purple), var(--pink)); }
+        .control.danger { background: var(--red); }
+        .control:disabled { opacity: .5; cursor: not-allowed; }
+        .status-dot {
+            display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+            background: #f59e0b; margin-right: 5px;
+        }
+        .status-dot.connected { background: var(--green); }
+        .status-dot.disconnected { background: var(--red); }
+        .hint { color: var(--muted); font-size: 12px; line-height: 1.6; margin-top: 12px; }
+        .toast {
+            display: none; position: fixed; bottom: 25px; left: 50%;
+            transform: translateX(-50%); padding: 12px 18px;
+            border-radius: 10px; background: #303c59; z-index: 1000;
+            max-width: calc(100% - 30px); text-align: center;
+        }
+        @media(max-width: 1000px) {
+            .layout { grid-template-columns: 1fr; }
+            .video-panel, #jitsi-container { min-height: 520px; height: 520px; }
+        }
+        @media(max-width: 600px) {
+            .layout, .topbar { padding: 14px; }
+            .video-panel, #jitsi-container { min-height: 430px; height: 430px; }
+            .control { min-width: 75px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">✦ <span>ConnectSphere</span></div>
+    <div class="meeting-info">
+        <div>
+            <strong>{{ meeting.title }}</strong>
+            <div class="room-code">Room ID: <span id="roomCode">{{ room_code }}</span></div>
+        </div>
+        <button class="control" id="copyRoomButton" type="button">Copy ID</button>
+        <div class="status">
+            <span class="status-dot" id="connectionDot"></span>
+            <span id="connectionStatus">Not connected</span>
+        </div>
+    </div>
+</header>
+
+<main class="layout">
+    <section class="main-content">
+        <div class="heading">
+            <div>
+                <h1>{{ meeting.title }}</h1>
+                <p>Connect, communicate and collaborate in real time.</p>
+            </div>
+            <strong id="participantSummary">0 participants</strong>
+        </div>
+
+        <div class="video-panel">
+            <div id="jitsi-container"></div>
+        </div>
+
+        <div class="toolbar">
+            <button class="control primary" id="joinButton" type="button">Join meeting</button>
+            <button class="control" id="cameraButton" type="button" disabled>📷 Camera on</button>
+            <button class="control" id="micButton" type="button" disabled>🎤 Mic on</button>
+            <button class="control" id="screenButton" type="button" disabled>🖥 Share screen</button>
+            <a class="control" href="{% url 'file_sharing:file_list' meeting.id %}">📁 Shared Files</a>
+            <button class="control danger" id="leaveButton" type="button" disabled>✕ Leave call</button>
+        </div>
+        <p class="hint">
+            Video meetings are provided by Jitsi Meet. Allow camera and microphone access
+            when your browser asks. Use HTTPS or localhost for device permissions.
+        </p>
+    </section>
+
+    <aside>
+        <section class="side-card">
+            <div class="side-header">
+                <h2>Participants</h2>
+                <span id="participantCount">0</span>
+            </div>
+            <div class="participants" id="participantsList">
+                <div class="participant" id="waitingParticipant">
+                    <div class="participant-avatar">👥</div>
+                    <span>Waiting to join</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="side-card">
+            <div class="side-header">
+                <h2>💬 Meeting chat</h2>
+                <span id="chatStatus">Available after joining</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message">
+                    <div class="chat-author">ConnectSphere</div>
+                    <div class="chat-text">Join the meeting to start chatting.</div>
+                </div>
+            </div>
+            <form class="chat-form" id="chatForm">
+                <input type="text" id="chatInput" placeholder="Write a message..."
+                       maxlength="1000" autocomplete="off" disabled>
+                <button type="submit" id="sendButton" disabled>Send</button>
+            </form>
+        </section>
+    </aside>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://meet.jit.si/external_api.js"></script>
+<script>
+(() => {
+    "use strict";
+
+    // Each Django meeting gets its own Jitsi room.
+    const ROOM_CODE = "{{ room_code|escapejs }}";
+    const USERNAME = "{{ request.user.username|escapejs }}";
+    const JITSI_DOMAIN = "meet.jit.si";
+
+    const $ = (id) => document.getElementById(id);
+    let jitsiApi = null;
+    let joined = false;
+    let cameraMuted = false;
+    let micMuted = false;
+    let screenSharing = false;
+    const participants = new Map();
+
+    function showToast(message) {
+        const toast = $("toast");
+        toast.textContent = message;
+        toast.style.display = "block";
+        window.clearTimeout(window.connectSphereToast);
+        window.connectSphereToast = window.setTimeout(() => {
+            toast.style.display = "none";
+        }, 3500);
+    }
+
+    function setStatus(message, state = "") {
+        $("connectionStatus").textContent = message;
+        $("connectionDot").className = "status-dot";
+        if (state) $("connectionDot").classList.add(state);
+    }
+
+    function setButtonsEnabled(enabled) {
+        $("cameraButton").disabled = !enabled;
+        $("micButton").disabled = !enabled;
+        $("screenButton").disabled = !enabled;
+        $("leaveButton").disabled = !enabled;
+        $("joinButton").disabled = enabled;
+        $("chatInput").disabled = !enabled;
+        $("sendButton").disabled = !enabled;
+    }
+
+    function updateControls() {
+        $("cameraButton").textContent = cameraMuted ? "📷 Camera on" : "📷 Camera off";
+        $("micButton").textContent = micMuted ? "🎤 Mic on" : "🎤 Mic off";
+        $("screenButton").textContent = screenSharing ? "Stop sharing" : "🖥 Share screen";
+        $("cameraButton").classList.toggle("active", !cameraMuted);
+        $("micButton").classList.toggle("active", !micMuted);
+        $("screenButton").classList.toggle("active", screenSharing);
+    }
+
+    function addParticipant(id, displayName) {
+        if (!id || participants.has(id)) return;
+        $("waitingParticipant")?.remove();
+
+        const row = document.createElement("div");
+        row.className = "participant";
+        row.dataset.participantId = id;
+
+        const avatar = document.createElement("div");
+        avatar.className = "participant-avatar";
+        avatar.textContent = (displayName || "U").charAt(0).toUpperCase();
+
+        const name = document.createElement("span");
+        name.textContent = displayName || "Participant";
+
+        row.append(avatar, name);
+        $("participantsList").appendChild(row);
+        participants.set(id, displayName || "Participant");
+        updateParticipantCount();
+    }
+
+    function removeParticipant(id) {
+        const row = [...$("participantsList").children]
+            .find(element => element.dataset.participantId === id);
+        row?.remove();
+        participants.delete(id);
+        if (participants.size === 0 && !$("waitingParticipant")) {
+            const waiting = document.createElement("div");
+            waiting.className = "participant";
+            waiting.id = "waitingParticipant";
+            waiting.innerHTML = '<div class="participant-avatar">👥</div><span>Waiting for participants</span>';
+            $("participantsList").appendChild(waiting);
+        }
+        updateParticipantCount();
+    }
+
+    function updateParticipantCount() {
+        const count = joined ? participants.size + 1 : 0;
+        $("participantCount").textContent = count;
+        $("participantSummary").textContent = count + (count === 1 ? " participant" : " participants");
+    }
+
+    function addChatMessage(author, message, mine = false) {
+        const item = document.createElement("div");
+        item.className = "chat-message" + (mine ? " mine" : "");
+
+        const authorElement = document.createElement("div");
+        authorElement.className = "chat-author";
+        authorElement.textContent = author || "Participant";
+
+        const textElement = document.createElement("div");
+        textElement.className = "chat-text";
+        textElement.textContent = message;
+
+        item.append(authorElement, textElement);
+        $("chatMessages").appendChild(item);
+        $("chatMessages").scrollTop = $("chatMessages").scrollHeight;
+    }
+
+    function connectMeeting() {
+        if (joined || jitsiApi) return;
+
+        if (typeof window.JitsiMeetExternalAPI !== "function") {
+            showToast("Jitsi could not load. Check your internet connection and refresh.");
+            return;
+        }
+
+        $("joinButton").disabled = true;
+        $("joinButton").textContent = "Opening meeting...";
+        setStatus("Connecting...");
+
+        // Jitsi room names should contain URL-safe characters.
+        const safeRoomCode = ROOM_CODE.replace(/[^a-zA-Z0-9_-]/g, "");
+        const roomName = "ConnectSphere-" + safeRoomCode;
+
+        try {
+            jitsiApi = new JitsiMeetExternalAPI(JITSI_DOMAIN, {
+                roomName: roomName,
+                parentNode: $("jitsi-container"),
+                width: "100%",
+                height: "100%",
+                userInfo: { displayName: USERNAME },
+                configOverwrite: {
+                    prejoinPageEnabled: true,
+                    startWithAudioMuted: false,
+                    startWithVideoMuted: false,
+                    disableDeepLinking: true
+                },
+                interfaceConfigOverwrite: {
+                    TILE_VIEW_MAX_COLUMNS: 4
+                }
+            });
+
+            jitsiApi.addEventListener("videoConferenceJoined", (event) => {
+                joined = true;
+                setButtonsEnabled(true);
+                $("joinButton").textContent = "✓ Joined";
+                $("joinButton").classList.add("active");
+                $("chatStatus").textContent = "Live";
+                setStatus("Connected", "connected");
+                addParticipant("local", USERNAME + " (You)");
+                showToast("You joined the ConnectSphere meeting.");
+            });
+
+            jitsiApi.addEventListener("participantJoined", (event) => {
+                const id = String(event.id);
+                addParticipant(id, event.displayName || "Participant");
+                showToast((event.displayName || "A participant") + " joined.");
+            });
+
+            jitsiApi.addEventListener("participantLeft", (event) => {
+                removeParticipant(String(event.id));
+                showToast("A participant left the meeting.");
+            });
+
+            jitsiApi.addEventListener("videoConferenceLeft", () => {
+                finishMeeting(false);
+            });
+
+            jitsiApi.addEventListener("readyToClose", () => {
+                finishMeeting(false);
+            });
+
+            jitsiApi.addEventListener("audioMuteStatusChanged", (event) => {
+                micMuted = Boolean(event.muted);
+                updateControls();
+            });
+
+            jitsiApi.addEventListener("videoMuteStatusChanged", (event) => {
+                cameraMuted = Boolean(event.muted);
+                updateControls();
+            });
+
+            jitsiApi.addEventListener("screenSharingStatusChanged", (event) => {
+                screenSharing = Boolean(event.on);
+                updateControls();
+            });
+
+            jitsiApi.addEventListener("chatMessageReceived", (event) => {
+                if (event.message) {
+                    addChatMessage(event.nick || "Participant", event.message, false);
+                }
+            });
+
+            jitsiApi.addEventListener("participantRoleChanged", (event) => {
+                console.log("Jitsi participant role:", event.role);
+            });
+
+        } catch (error) {
+            console.error("Jitsi initialization error:", error);
+            jitsiApi = null;
+            $("joinButton").disabled = false;
+            $("joinButton").textContent = "Join meeting";
+            setStatus("Connection failed", "disconnected");
+            showToast("Could not open the meeting. Please try again.");
+        }
+    }
+
+    function finishMeeting(showMessage = true) {
+        joined = false;
+        jitsiApi = null;
+        participants.clear();
+        $("participantsList").innerHTML =
+            '<div class="participant" id="waitingParticipant"><div class="participant-avatar">👥</div><span>Waiting to join</span></div>';
+
+        cameraMuted = false;
+        micMuted = false;
+        screenSharing = false;
+        setButtonsEnabled(false);
+        updateControls();
+        updateParticipantCount();
+
+        $("joinButton").textContent = "Join meeting";
+        $("joinButton").classList.remove("active");
+        $("chatStatus").textContent = "Available after joining";
+        setStatus("Not connected", "disconnected");
+        if (showMessage) showToast("You left the meeting.");
+    }
+
+    function leaveMeeting() {
+        if (!jitsiApi) return;
+        try {
+            jitsiApi.executeCommand("hangup");
+        } catch (error) {
+            console.error("Jitsi hangup error:", error);
+            finishMeeting();
+        }
+    }
+
+    $("joinButton").addEventListener("click", connectMeeting);
+
+    $("cameraButton").addEventListener("click", () => {
+        if (!jitsiApi || !joined) return;
+        jitsiApi.executeCommand("toggleVideo");
+    });
+
+    $("micButton").addEventListener("click", () => {
+        if (!jitsiApi || !joined) return;
+        jitsiApi.executeCommand("toggleAudio");
+    });
+
+    $("screenButton").addEventListener("click", () => {
+        if (!jitsiApi || !joined) return;
+        jitsiApi.executeCommand("toggleShareScreen");
+    });
+
+    $("leaveButton").addEventListener("click", leaveMeeting);
+
+    $("copyRoomButton").addEventListener("click", async () => {
+        try {
+            await navigator.clipboard.writeText(ROOM_CODE);
+            showToast("Meeting ID copied.");
+        } catch (error) {
+            showToast("Room ID: " + ROOM_CODE);
+        }
+    });
+
+    $("chatForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const message = $("chatInput").value.trim();
+        if (!message || !jitsiApi || !joined) return;
+
+        try {
+            jitsiApi.executeCommand("sendChatMessage", message);
+            addChatMessage(USERNAME + " (You)", message, true);
+            $("chatInput").value = "";
+        } catch (error) {
+            console.error("Jitsi chat error:", error);
+            showToast("Unable to send chat message.");
+        }
+    });
+
+    setButtonsEnabled(false);
+    updateControls();
+    updateParticipantCount();
+})();
+</script>
+
+</body>
+</html>

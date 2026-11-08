@@ -1,0 +1,684 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule a Meeting | ConnectSphere</title>
+
+    <style>
+        :root {
+            --bg: #0b1020;
+            --panel: #151c30;
+            --card: #19243b;
+            --input: #0d1426;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --text: #f4f6ff;
+            --muted: #9ba8c7;
+            --border: #ffffff18;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 35px 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background:
+                radial-gradient(circle at 10% 10%, #673ab722, transparent 35%),
+                radial-gradient(circle at 90% 90%, #ec489922, transparent 35%),
+                var(--bg);
+            color: var(--text);
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 1050px;
+            display: grid;
+            grid-template-columns: 0.85fr 1.15fr;
+            gap: 25px;
+            align-items: stretch;
+        }
+
+        /* LEFT INFORMATION PANEL */
+
+        .info-panel {
+            padding: 38px 30px;
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            background: linear-gradient(145deg, #1b2540, #11182b);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .logo {
+            width: 47px;
+            height: 47px;
+            display: grid;
+            place-items: center;
+            border-radius: 15px;
+            font-size: 25px;
+            color: white;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            box-shadow: 0 8px 25px #8b5cf655;
+        }
+
+        .brand-name {
+            background: linear-gradient(135deg, #ffffff, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .info-content {
+            margin: 55px 0;
+        }
+
+        .eyebrow {
+            color: #c4b5fd;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .info-content h1 {
+            font-size: 36px;
+            line-height: 1.25;
+            margin-bottom: 18px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .info-content p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .meeting-illustration {
+            width: 100%;
+            min-height: 190px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #8b5cf622, #ec489922);
+            border: 1px solid #ffffff12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            font-size: 55px;
+        }
+
+        .info-footer {
+            margin-top: 25px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* FORM PANEL */
+
+        .form-panel {
+            padding: 38px;
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            background: var(--panel);
+            box-shadow: 0 20px 60px #00000030;
+        }
+
+        .form-heading {
+            margin-bottom: 28px;
+        }
+
+        .form-heading .eyebrow {
+            margin-bottom: 10px;
+        }
+
+        .form-heading h2 {
+            font-size: 27px;
+            margin-bottom: 10px;
+        }
+
+        .form-heading p {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .field {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #e4e8f7;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ffffff20;
+            border-radius: 11px;
+            outline: none;
+            background: var(--input);
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            transition: .25s;
+            color-scheme: dark;
+        }
+
+        input::placeholder {
+            color: #71809f;
+        }
+
+        input:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px #8b5cf622;
+        }
+
+        input::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+        }
+
+        .field-hint {
+            margin-top: 9px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .time-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 17px;
+        }
+
+        .messages {
+            padding: 13px 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            background: #ef444422;
+            border: 1px solid #ef444455;
+            color: #fca5a5;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .messages.success {
+            background: #22c55e18;
+            border-color: #22c55e55;
+            color: #86efac;
+        }
+
+        .messages.warning {
+            background: #f59e0b18;
+            border-color: #f59e0b55;
+            color: #fcd34d;
+        }
+
+        .error-message {
+            display: none;
+            margin-top: 8px;
+            color: #fca5a5;
+            font-size: 12px;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .25s;
+            box-shadow: 0 8px 25px #8b5cf633;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px #8b5cf655;
+        }
+
+        .submit-button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 23px;
+            text-align: center;
+            color: #c4b5fd;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .back-link:hover {
+            color: #f472b6;
+        }
+
+        .secure-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 25px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        @media(max-width: 800px) {
+            .page-wrapper {
+                max-width: 600px;
+                grid-template-columns: 1fr;
+            }
+
+            .info-panel {
+                padding: 25px;
+            }
+
+            .info-content {
+                margin: 35px 0;
+            }
+
+            .info-content h1 {
+                font-size: 29px;
+            }
+
+            .meeting-illustration {
+                min-height: 120px;
+                font-size: 40px;
+            }
+
+            .info-footer {
+                display: none;
+            }
+        }
+
+        @media(max-width: 500px) {
+            body {
+                padding: 15px 10px;
+            }
+
+            .form-panel {
+                padding: 25px 20px;
+            }
+
+            .form-heading h2 {
+                font-size: 23px;
+            }
+
+            .info-content h1 {
+                font-size: 27px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-wrapper">
+
+    <!-- LEFT INFORMATION PANEL -->
+
+    <section class="info-panel">
+
+        <div class="brand">
+            <span class="logo">✦</span>
+            <span class="brand-name">ConnectSphere</span>
+        </div>
+
+        <div class="info-content">
+
+            <div class="eyebrow">PLAN YOUR SESSION</div>
+
+            <h1>
+                Bring your team
+                <span class="gradient-text">together.</span>
+            </h1>
+
+            <p>
+                Create your virtual meeting space and invite your
+                team members to connect, communicate and collaborate
+                from anywhere.
+            </p>
+
+            <div class="meeting-illustration">
+                <span>👩‍💻</span>
+                <span>💬</span>
+                <span>👨‍💻</span>
+            </div>
+
+        </div>
+
+        <div class="info-footer">
+            ✦ ConnectSphere — Connect beyond boundaries.
+        </div>
+
+    </section>
+
+
+    <!-- RIGHT FORM PANEL -->
+
+    <main class="form-panel">
+
+        <div class="form-heading">
+
+            <div class="eyebrow">NEW MEETING</div>
+
+            <h2>Schedule a meeting</h2>
+
+            <p>
+                Fill in the details below to create your
+                meeting session.
+            </p>
+
+        </div>
+
+
+        <!-- DJANGO MESSAGES -->
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="messages
+                    {% if message.tags == 'success' %}success
+                    {% elif message.tags == 'warning' %}warning
+                    {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+
+        <!-- MEETING FORM -->
+
+        <form method="POST" id="meetingForm">
+
+            {% csrf_token %}
+
+            <div class="field">
+
+                <label for="title">Meeting title</label>
+
+                <input
+                    id="title"
+                    name="title"
+                    type="text"
+                    maxlength="150"
+                    placeholder="e.g. Project Planning Session"
+                    value="{{ form_data.title|default:'' }}"
+                    required
+                    autofocus
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="scheduled_start">
+                    Start date and time
+                </label>
+
+                <div class="input-wrapper">
+
+                    <input
+                        id="scheduled_start"
+                        name="scheduled_start"
+                        type="datetime-local"
+                        value="{{ form_data.scheduled_start|default:'' }}"
+                        required
+                    >
+
+                </div>
+
+                <p class="field-hint">
+                    Select when your meeting should begin.
+                </p>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="scheduled_end">
+                    End date and time
+                </label>
+
+                <div class="input-wrapper">
+
+                    <input
+                        id="scheduled_end"
+                        name="scheduled_end"
+                        type="datetime-local"
+                        value="{{ form_data.scheduled_end|default:'' }}"
+                        required
+                    >
+
+                </div>
+
+                <p class="field-hint">
+                    Use your local time (India Standard Time).
+                    End time must be later than start time.
+                </p>
+
+                <p class="error-message" id="dateError"></p>
+
+            </div>
+
+
+            <button
+                class="submit-button"
+                type="submit"
+                id="submitButton"
+            >
+                Create Scheduled Meeting →
+            </button>
+
+        </form>
+
+
+        <a
+            class="back-link"
+            href="{% url 'meetings:meeting_list' %}"
+        >
+            ← Back to My Meetings
+        </a>
+
+
+        <div class="secure-note">
+            🔒 Your meeting is managed through ConnectSphere.
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    const startInput = document.getElementById("scheduled_start");
+    const endInput = document.getElementById("scheduled_end");
+    const meetingForm = document.getElementById("meetingForm");
+    const submitButton = document.getElementById("submitButton");
+    const dateError = document.getElementById("dateError");
+
+    // Format browser local date
+
+    function formatLocalDate(date) {
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+
+    }
+
+
+    // Set minimum start time to two minutes from now
+
+    function updateStartMinimum() {
+
+        const now = new Date();
+
+        now.setMinutes(now.getMinutes() + 2);
+        now.setSeconds(0, 0);
+
+        startInput.min = formatLocalDate(now);
+
+    }
+
+
+    // End time must be later than start time
+
+    function updateEndMinimum() {
+
+        if (startInput.value) {
+
+            endInput.min = startInput.value;
+
+        } else {
+
+            endInput.removeAttribute("min");
+
+        }
+
+    }
+
+
+    // Display validation error
+
+    function showDateError(message) {
+
+        dateError.textContent = message;
+        dateError.style.display = "block";
+
+    }
+
+
+    function clearDateError() {
+
+        dateError.textContent = "";
+        dateError.style.display = "none";
+
+    }
+
+
+    // Initialize minimum date
+
+    updateStartMinimum();
+
+    updateEndMinimum();
+
+
+    // Update end date when start changes
+
+    startInput.addEventListener("change", function() {
+
+        updateEndMinimum();
+        clearDateError();
+
+    });
+
+
+    endInput.addEventListener("change", clearDateError);
+
+
+    // Form validation
+
+    meetingForm.addEventListener("submit", function(event) {
+
+        updateStartMinimum();
+
+        if (
+            !startInput.value ||
+            startInput.value < startInput.min
+        ) {
+
+            event.preventDefault();
+
+            showDateError(
+                "Please select a future meeting start time."
+            );
+
+            startInput.focus();
+
+            return;
+
+        }
+
+
+        if (
+            !endInput.value ||
+            endInput.value <= startInput.value
+        ) {
+
+            event.preventDefault();
+
+            showDateError(
+                "Meeting end time must be later than start time."
+            );
+
+            endInput.focus();
+
+            return;
+
+        }
+
+
+        clearDateError();
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Creating Meeting...";
+
+    });
+
+</script>
+
+</body>
+</html>

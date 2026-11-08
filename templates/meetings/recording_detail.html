@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Recording | ConnectSphere</title>
+    <style>
+        body {
+            margin: 0; padding: 25px; background: #f5f6fc;
+            color: #19213c; font-family: "Segoe UI", Arial, sans-serif;
+        }
+        main {
+            max-width: 950px; margin: 30px auto; padding: 28px;
+            border: 1px solid #e7e9f2; border-radius: 20px;
+            background: white; box-shadow: 0 12px 35px #1725540c;
+        }
+        .brand { color: #6547ed; font-weight: 800; }
+        h1 { margin-bottom: 8px; }
+        .muted { color: #6f7892; line-height: 1.7; }
+        video { display: block; width: 100%; max-height: 65vh; margin: 22px 0; background: #0b1020; border-radius: 14px; }
+        a { color: #6547ed; text-decoration: none; font-weight: 700; }
+    </style>
+</head>
+<body>
+<main>
+    <div class="brand">✦ ConnectSphere</div>
+    <h1>{{ meeting.title }} — Recording</h1>
+    <p class="muted">
+        Uploaded {{ recording.uploaded_at|date:"M d, Y H:i" }}.
+        Only authorized meeting participants can access this page.
+    </p>
+
+    <video controls preload="metadata">
+        <source src="{% url 'meetings:play_recording' recording_id=recording.id %}">
+        Your browser does not support HTML video playback.
+    </video>
+
+    <p><a href="{% url 'meetings:meeting_list' %}">← Back to meetings</a></p>
+</main>
+</body>
+</html>

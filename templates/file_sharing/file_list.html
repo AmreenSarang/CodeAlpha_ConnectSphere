@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Files | ConnectSphere</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            font-family: Arial, sans-serif;
+            background: #0b1020;
+            color: #f4f6ff;
+        }
+
+        .container { max-width: 900px; margin: auto; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        h1 { margin: 0 0 8px; }
+        .muted { color: #9ba8c7; line-height: 1.6; }
+
+        .card {
+            padding: 22px;
+            margin-bottom: 20px;
+            background: #151c30;
+            border: 1px solid #2b3550;
+            border-radius: 16px;
+        }
+
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            margin: 18px 0;
+            padding: 12px;
+            color: white;
+            background: #0b1020;
+            border: 1px solid #374151;
+            border-radius: 8px;
+        }
+
+        button, .button {
+            display: inline-block;
+            padding: 11px 16px;
+            border: 0;
+            border-radius: 9px;
+            color: white;
+            background: #8b5cf6;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .secondary { background: #293550; }
+
+        .file-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #2b3550;
+        }
+
+        .file-row:last-child { border-bottom: 0; }
+        .file-name { overflow-wrap: anywhere; font-weight: bold; }
+        .file-meta { color: #9ba8c7; font-size: 12px; margin-top: 7px; }
+        .message { padding: 12px; margin-bottom: 12px; background: #263c36; border-radius: 8px; }
+        .errorlist { color: #fca5a5; }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <header class="header">
+        <div>
+            <h1>📁 Meeting Files</h1>
+            <p class="muted">
+                Meeting: {{ meeting.title }}
+            </p>
+            <p class="muted">
+                Share documents for this meeting.
+            </p>
+        </div>
+        <a class="button secondary" href="{% url 'dashboard' %}">
+            ← Dashboard
+        </a>
+    </header>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <section class="card">
+        <h2>Upload a file</h2>
+        <p class="muted">Maximum size: 10 MB. Supported documents, images, spreadsheets and ZIP files.</p>
+
+        <form method="post"
+              action="{% url 'file_sharing:upload_file' meeting.id %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.file.errors }}
+            <label for="{{ form.file.id_for_label }}">Choose a file</label>
+            {{ form.file }}
+            <button type="submit">Upload File</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Shared files</h2>
+
+        {% for shared_file in files %}
+            <div class="file-row">
+                <div>
+                    <div class="file-name">
+                        📄 {{ shared_file.original_name }}
+                    </div>
+                    <div class="file-meta">
+                        Uploaded by {{ shared_file.uploaded_by.username }}
+                        · {{ shared_file.file_size|filesizeformat }}
+                        · {{ shared_file.uploaded_at|date:"d M Y, h:i A" }}
+                    </div>
+                </div>
+
+                <a class="button"
+                   href="{% url 'file_sharing:download_file' meeting.id shared_file.id %}">
+                    Download
+                </a>
+            </div>
+        {% empty %}
+            <p class="muted">No files have been shared in this meeting yet.</p>
+        {% endfor %}
+    </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,854 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | ConnectSphere</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --purple: #7047eb;
+            --purple-dark: #5130c9;
+            --pink: #ec4899;
+            --text: #19213c;
+            --muted: #78819b;
+            --border: #e9e9f3;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 35px 20px;
+
+            font-family: 'Inter', sans-serif;
+
+            background:
+                radial-gradient(circle at 10% 15%, #e6dfff 0, transparent 30%),
+                radial-gradient(circle at 90% 85%, #fbdcf0 0, transparent 30%),
+                #f6f5fc;
+        }
+
+        /* MAIN CONTAINER */
+
+        .page-container {
+            width: 100%;
+            max-width: 1080px;
+            min-height: 650px;
+
+            display: grid;
+            grid-template-columns: 0.95fr 1.05fr;
+
+            overflow: hidden;
+            border-radius: 28px;
+
+            background: white;
+
+            box-shadow: 0 25px 80px rgba(62, 43, 126, 0.13);
+
+            animation: appear .7s ease;
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* LEFT PANEL */
+
+        .left-panel {
+            position: relative;
+            overflow: hidden;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            padding: 42px;
+            color: white;
+
+            background: linear-gradient(
+                145deg,
+                #4930c6,
+                #7047eb 55%,
+                #b04ce5
+            );
+        }
+
+        .left-panel::before,
+        .left-panel::after {
+            content: "";
+            position: absolute;
+            border: 1px solid #ffffff25;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .left-panel::before {
+            width: 330px;
+            height: 330px;
+            right: -140px;
+            top: 80px;
+        }
+
+        .left-panel::after {
+            width: 250px;
+            height: 250px;
+            left: -130px;
+            bottom: -80px;
+        }
+
+        /* BRAND */
+
+        .brand {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            font-size: 23px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 14px;
+
+            background: #ffffff25;
+            border: 1px solid #ffffff45;
+
+            font-size: 24px;
+        }
+
+        /* LEFT CONTENT */
+
+        .left-content {
+            position: relative;
+            z-index: 2;
+            margin-top: 60px;
+        }
+
+        .tag {
+            display: inline-block;
+
+            padding: 9px 15px;
+
+            border: 1px solid #ffffff40;
+            border-radius: 30px;
+
+            background: #ffffff16;
+
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .left-content h1 {
+            margin-top: 25px;
+
+            font-size: clamp(32px, 4vw, 45px);
+            line-height: 1.18;
+            letter-spacing: -2px;
+            font-weight: 900;
+        }
+
+        .left-content h1 span {
+            color: #fbcfe8;
+        }
+
+        .left-content p {
+            margin-top: 20px;
+            max-width: 360px;
+
+            color: #e9e4ff;
+
+            font-size: 14px;
+            line-height: 1.9;
+        }
+
+        /* FEATURES */
+
+        .feature-list {
+            display: grid;
+            gap: 17px;
+            margin-top: 35px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .feature-icon {
+            width: 37px;
+            height: 37px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 11px;
+            background: #ffffff20;
+
+            font-size: 17px;
+        }
+
+        .left-footer {
+            position: relative;
+            z-index: 2;
+
+            margin-top: 50px;
+
+            color: #e5ddff;
+            font-size: 11px;
+        }
+
+        /* RIGHT PANEL */
+
+        .right-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 45px;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 410px;
+        }
+
+        .mobile-brand {
+            display: none;
+        }
+
+        /* HEADING */
+
+        .form-heading {
+            margin-bottom: 27px;
+        }
+
+        .small-title {
+            color: var(--purple);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        .form-heading h2 {
+            margin-top: 11px;
+
+            color: var(--text);
+
+            font-size: 31px;
+            font-weight: 900;
+            letter-spacing: -1.2px;
+        }
+
+        .form-heading p {
+            margin-top: 9px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* FORM */
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+
+            color: #303957;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            min-height: 49px;
+
+            padding: 13px 15px;
+
+            border: 1px solid var(--border);
+            border-radius: 11px;
+
+            outline: none;
+            background: #fbfbfe;
+
+            color: var(--text);
+
+            font-family: inherit;
+            font-size: 13px;
+
+            transition: .25s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--purple);
+            background: white;
+
+            box-shadow: 0 0 0 4px #7047eb16;
+        }
+
+        .form-group input::placeholder {
+            color: #a7adbf;
+        }
+
+        .form-group ul {
+            padding-left: 18px;
+            margin-top: 8px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        /* PASSWORD FIELD */
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-wrapper input {
+            padding-right: 50px !important;
+        }
+
+        .toggle-password {
+            position: absolute;
+
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: none;
+            border-radius: 7px;
+
+            background: transparent;
+            color: #8991a8;
+
+            cursor: pointer;
+
+            transition: .2s;
+        }
+
+        .toggle-password:hover {
+            color: var(--purple);
+            background: #f0edff;
+        }
+
+        .toggle-password svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .field-error {
+            margin-top: 6px;
+            color: #dc3545;
+            font-size: 11px;
+        }
+
+        .alert {
+            padding: 12px 14px;
+            margin-bottom: 17px;
+
+            border-radius: 10px;
+
+            background: #fff0f2;
+            color: #c62d4c;
+
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .alert ul {
+            padding-left: 17px;
+        }
+
+        /* BUTTON */
+
+        .submit-btn {
+            width: 100%;
+            min-height: 51px;
+
+            margin-top: 7px;
+
+            border: none;
+            border-radius: 12px;
+
+            background: linear-gradient(110deg, #6547ed, #9149e9);
+
+            color: white;
+
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: .3s;
+
+            box-shadow: 0 8px 20px #7047eb30;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px #7047eb45;
+        }
+
+        .submit-btn:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* LOGIN LINK */
+
+        .login-text {
+            margin-top: 24px;
+
+            color: var(--muted);
+            text-align: center;
+
+            font-size: 12px;
+        }
+
+        .login-text a {
+            color: var(--purple);
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .login-text a:hover {
+            text-decoration: underline;
+        }
+
+        .security-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+
+            margin-top: 24px;
+
+            color: #9aa1b4;
+            font-size: 10px;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 850px) {
+
+            .page-container {
+                max-width: 520px;
+                grid-template-columns: 1fr;
+            }
+
+            .left-panel {
+                display: none;
+            }
+
+            .right-panel {
+                padding: 40px 30px;
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                margin-bottom: 35px;
+
+                font-size: 21px;
+                font-weight: 900;
+                color: var(--text);
+            }
+
+            .mobile-brand .brand-icon {
+                color: white;
+                background: linear-gradient(135deg, #6547ed, #ec4899);
+            }
+        }
+
+        @media(max-width: 480px) {
+
+            body {
+                padding: 12px;
+            }
+
+            .page-container {
+                border-radius: 19px;
+            }
+
+            .right-panel {
+                padding: 30px 20px;
+            }
+
+            .form-heading h2 {
+                font-size: 27px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <!-- LEFT PANEL -->
+
+    <section class="left-panel">
+
+        <div class="brand">
+            <div class="brand-icon">✦</div>
+            ConnectSphere
+        </div>
+
+        <div class="left-content">
+
+            <span class="tag">
+                ✦ CONNECT • COLLABORATE • CREATE
+            </span>
+
+            <h1>
+                Your people.<br>
+                Your ideas.<br>
+                <span>One space.</span>
+            </h1>
+
+            <p>
+                Bring your team closer with seamless video meetings,
+                real-time conversations and smarter collaboration.
+                Everything you need, all in one place.
+            </p>
+
+            <div class="feature-list">
+
+                <div class="feature">
+                    <div class="feature-icon">🎥</div>
+                    <span>HD Video Meetings</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🖥️</div>
+                    <span>Real-time Screen Sharing</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📁</div>
+                    <span>Easy File Sharing</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">💬</div>
+                    <span>Team Communication</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="left-footer">
+            © 2026 ConnectSphere. Built for better collaboration.
+        </div>
+
+    </section>
+
+
+    <!-- RIGHT PANEL -->
+
+    <section class="right-panel">
+
+        <div class="form-container">
+
+            <!-- MOBILE BRAND -->
+
+            <div class="mobile-brand">
+                <div class="brand-icon">✦</div>
+                ConnectSphere
+            </div>
+
+            <!-- HEADING -->
+
+            <div class="form-heading">
+
+                <span class="small-title">
+                    GET STARTED FOR FREE
+                </span>
+
+                <h2>Create your account</h2>
+
+                <p>
+                    Join ConnectSphere and make collaboration
+                    easier, faster and smarter.
+                </p>
+
+            </div>
+
+
+            <!-- REGISTRATION FORM -->
+
+            <form method="POST" id="registerForm">
+
+                {% csrf_token %}
+
+                <!-- GENERAL ERRORS -->
+
+                {% if form.non_field_errors %}
+
+                    <div class="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+
+                {% endif %}
+
+
+                <!-- DYNAMIC DJANGO FORM FIELDS -->
+
+                {% for field in form %}
+
+                    <div class="form-group">
+
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+
+                            <ul>
+                                {{ field.help_text|safe }}
+                            </ul>
+
+                        {% endif %}
+
+                        {% for error in field.errors %}
+
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endfor %}
+
+
+                <!-- SUBMIT BUTTON -->
+
+                <button type="submit"
+                        class="submit-btn"
+                        id="submitButton">
+
+                    Create My Account →
+
+                </button>
+
+            </form>
+
+
+            <!-- LOGIN LINK -->
+
+            <div class="login-text">
+
+                Already have an account?
+
+                <a href="{% url 'accounts:login' %}">
+                    Sign in
+                </a>
+
+            </div>
+
+
+            <!-- SECURITY -->
+
+            <div class="security-text">
+                🔒 Your account is protected with secure authentication.
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- SHOW / HIDE PASSWORD SCRIPT -->
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // Find all password inputs in Django form.
+        const passwordFields = document.querySelectorAll(
+            'input[type="password"]'
+        );
+
+        passwordFields.forEach(function(input) {
+
+            // Create password wrapper.
+            const wrapper = document.createElement("div");
+            wrapper.className = "password-wrapper";
+
+            // Insert wrapper around input.
+            input.parentNode.insertBefore(wrapper, input);
+            wrapper.appendChild(input);
+
+            // Create eye button.
+            const button = document.createElement("button");
+
+            button.type = "button";
+            button.className = "toggle-password";
+
+            button.setAttribute("aria-label", "Show password");
+            button.setAttribute("title", "Show password");
+
+            // Eye icon.
+            const eyeIcon = `
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            `;
+
+            // Eye off icon.
+            const eyeOffIcon = `
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 3l18 18"></path>
+                    <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path>
+                    <path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a16 16 0 0 1-3.2 4.1"></path>
+                    <path d="M6.2 6.2C3.4 8.1 2 12 2 12s3.5 7 10 7a10.8 10.8 0 0 0 4.1-.8"></path>
+                </svg>
+            `;
+
+            button.innerHTML = eyeIcon;
+
+            // Add button inside wrapper.
+            wrapper.appendChild(button);
+
+            // Show / hide functionality.
+            button.addEventListener("click", function() {
+
+                if (input.type === "password") {
+
+                    input.type = "text";
+
+                    button.innerHTML = eyeOffIcon;
+
+                    button.setAttribute(
+                        "aria-label",
+                        "Hide password"
+                    );
+
+                    button.setAttribute(
+                        "title",
+                        "Hide password"
+                    );
+
+                } else {
+
+                    input.type = "password";
+
+                    button.innerHTML = eyeIcon;
+
+                    button.setAttribute(
+                        "aria-label",
+                        "Show password"
+                    );
+
+                    button.setAttribute(
+                        "title",
+                        "Show password"
+                    );
+
+                }
+
+                input.focus();
+
+            });
+
+        });
+
+        // Prevent accidental multiple submissions.
+        const form = document.getElementById("registerForm");
+        const submitButton = document.getElementById("submitButton");
+
+        form.addEventListener("submit", function(event) {
+
+            if (!form.checkValidity()) {
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Creating your account...";
+
+        });
+
+    });
+
+</script>
+
+</body>
+</html>
